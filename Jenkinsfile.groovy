@@ -1,9 +1,17 @@
 node {
     stage("Say Hello"){
-        properties([parameters([string(defaultValue: '34.253.214.183', description: '''Dev: 34.253.214.183 Qa: 34.254.184.67 Prod: 34.253.225.101''', name: 'Remote_instance', trim: true)])])
-        git 'https://github.com/dilfuza97/jenkins_html.git'
+      properties([parameters([string(defaultValue: '34.247.30.115', description: '''Dev: 34.247.30.115 Qa: 34.240.9.133 Prod: 52.210.154.4''', name: 'Dev', trim: true)])])
     }
     stage("Install Apache"){
-        sh "ssh ec2-user@${Remote_instance}  sudo yum install httpd -y"
+        sh "ssh   ec2-user@${Remote_instances}    sudo yum install httpd -y"
+    }
+    stage("Create Index.html"){
+        sh "scp  index.html  ec2-user@${Remote_instances}:/tmp"
+    }
+    stage("Move Files"){
+        sh "ssh   ec2-user@${Remote_instances}    sudo mv /tmp/index.html  /var/www/html/index.html"
+    }
+    stage("Restart httpd"){
+        sh "ssh   ec2-user@${Remote_instances} sudo systemctl restart  httpd"
     }
 }
